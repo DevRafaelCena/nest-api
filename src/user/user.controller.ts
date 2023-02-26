@@ -16,13 +16,18 @@ export class UserController {
 
   @Get()
   async read() {
-    return { users: [] };
+
+    const users = await this.userService.list();
+
+    return { users: users };
   }
 
   @Get(':id')
   async readOne(@Param('id', ParseIntPipe) id) {
-    console.log(id);
-    return { user: {} }
+    
+    const user = await this.userService.readOne(id);
+
+    return { user: user }
   }
 
   @Put(':id')

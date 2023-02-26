@@ -31,15 +31,20 @@ export class UserController {
   }
 
   @Put(':id')
-  async update(@Param('id', ParseIntPipe) id, @Body() { email, name , password } : UpdatePutUserDto) {
-    console.log(id);
-    return { email, name , password };
+  async update(@Param('id', ParseIntPipe) id, @Body() { email, name , password ,birthAt} : UpdatePutUserDto) {
+
+    if(!birthAt){
+      birthAt = null
+    }
+
+    const update = await this.userService.update(id, { email, name , password, birthAt });
+    return update ;
   }
 
   @Patch(':id')
   async updateOne(@Param('id', ParseIntPipe) id, @Body() body: UpdatePatchUserDto) {
-    console.log(id);
-    return body;
+    const update = await this.userService.updatePartial(id, body);
+    return update;
   }
 
   @Delete(':id')

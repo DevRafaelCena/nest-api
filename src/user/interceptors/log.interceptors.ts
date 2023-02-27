@@ -8,8 +8,14 @@ export class LogInterceptor implements NestInterceptor {
     const now = Date.now();
     return next
       .handle()
-      .pipe(
-        tap(() => console.log(`After... ${Date.now() - now}ms`)),
+      .pipe(       
+
+        tap(() => {
+            const request = context.switchToHttp().getRequest();
+
+            console.log(request.url)
+            console.log(`After... ${Date.now() - now}ms`)
+        }),
       );
   }
 }

@@ -3,8 +3,9 @@ import { UseInterceptors } from '@nestjs/common/decorators';
 import { CreateUserDto } from './dto/create-user-dto';
 import { UpdatePatchUserDto } from './dto/update-patch-user-dto';
 import { UpdatePutUserDto } from './dto/update-put-user-dto';
-import { LogInterceptor } from './interceptors/log.interceptors';
+import { LogInterceptor } from '../interceptors/log.interceptors';
 import { UserService } from './user.service';
+import { ParamId } from 'src/decorators/param-id.decorator';
 
 @Controller('user')
 export class UserController {
@@ -26,11 +27,11 @@ export class UserController {
   }
 
   @Get(':id')
-  async readOne(@Param('id', ParseIntPipe) id) {
+  async readOne(@ParamId() id) {
     
     const user = await this.userService.readOne(id);
 
-    return { user: user }
+    return user
   }
 
   @Put(':id')

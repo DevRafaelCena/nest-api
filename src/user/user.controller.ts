@@ -11,20 +11,21 @@ import { Role } from 'src/enums/role.enum';
 import { RoleGuard } from 'src/guards/role.guard';
 import { AuthGuard } from 'src/guards/auth.guard';
 
-@UseGuards(AuthGuard, RoleGuard)
+@Roles(Role.Admin)  // regra de permissao global
 @UseInterceptors(LogInterceptor)
+@UseGuards(AuthGuard, RoleGuard)
 @Controller('user')
 export class UserController {
 
   constructor(private readonly userService: UserService){}
     
-  @Roles(Role.Admin)  
+  @Roles(Role.Admin)  // regra de permissao individual
   @Post()
   async create(@Body() body : CreateUserDto) {
     return this.userService.create(body)
   }
 
-  @Roles(Role.Admin)
+  
   @Get()
   async read() {
 
@@ -33,7 +34,7 @@ export class UserController {
     return { users: users };
   }
 
-  @Roles(Role.Admin)
+ 
   @Get(':id')
   async readOne(@ParamId() id) {
     
@@ -42,7 +43,7 @@ export class UserController {
     return user
   }
 
-  @Roles(Role.Admin)
+ 
   @Put(':id')
   async update(@Param('id', ParseIntPipe) id, @Body() { email, name , password ,birthAt, role} : UpdatePutUserDto) {
 
@@ -54,14 +55,14 @@ export class UserController {
     return update ;
   }
 
-  @Roles(Role.Admin)
+ 
   @Patch(':id')
   async updateOne(@Param('id', ParseIntPipe) id, @Body() body: UpdatePatchUserDto) {
     const update = await this.userService.updatePartial(id, body);
     return update;
   }
 
-  @Roles(Role.Admin)
+ 
   @Delete(':id')
   async delete(@Param('id', ParseIntPipe) id) {
    

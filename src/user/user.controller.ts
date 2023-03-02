@@ -10,6 +10,7 @@ import { Roles } from 'src/decorators/role.decorator';
 import { Role } from 'src/enums/role.enum';
 import { RoleGuard } from 'src/guards/role.guard';
 import { AuthGuard } from 'src/guards/auth.guard';
+import { SkipThrottle, Throttle } from '@nestjs/throttler/dist/throttler.decorator';
 
 @Roles(Role.Admin)  // regra de permissao global
 @UseInterceptors(LogInterceptor)
@@ -19,13 +20,14 @@ export class UserController {
 
   constructor(private readonly userService: UserService){}
     
+  @Throttle(10, 60) // throttle subscrever a regra global de permissao 
   @Roles(Role.Admin)  // regra de permissao individual
   @Post()
   async create(@Body() body : CreateUserDto) {
     return this.userService.create(body)
   }
 
-  
+  @SkipThrottle() // skip throttle
   @Get()
   async read() {
 

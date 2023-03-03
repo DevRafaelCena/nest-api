@@ -1,4 +1,4 @@
-import { Body, Controller, Post, UploadedFile, UseGuards, UseInterceptors } from "@nestjs/common";
+import { BadRequestException, Body, Controller, Post, UploadedFile, UseGuards, UseInterceptors } from "@nestjs/common";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { User } from "src/decorators/user.decorator";
 import { AuthGuard } from "src/guards/auth.guard";
@@ -55,7 +55,13 @@ export class AuthController {
     async uploadPhoto(@User() user, @UploadedFile('file') photo : Express.Multer.File){
 
         const path = await join(__dirname, '..', '..', 'storage', 'photos', 'photo_'+ user.id + '.jpg')
-        return this.fileService.upload(photo, path);
+       
+        try{
+           await this.fileService.upload(photo, path);
+        }catch(e){
+            throw new BadRequestException('Error uploading photo')
+        }
+        return {'message': 'Photo uploaded'}
     }
 
 }

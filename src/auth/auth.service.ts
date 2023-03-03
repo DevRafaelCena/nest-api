@@ -5,6 +5,7 @@ import { PrismaService } from "src/prisma/prisma.service";
 import { UserService } from "src/user/user.service";
 import { AuthRegisterDTO } from "./dto/auth-register.dto";
 import * as bcrypt from 'bcrypt'
+import { MailerService } from "@nestjs-modules/mailer/dist";
 
 @Injectable()
 export class AuthService {
@@ -12,7 +13,8 @@ export class AuthService {
     constructor(
         private readonly jwtService: JwtService,
         private readonly prisma: PrismaService,
-        private readonly userService: UserService
+        private readonly userService: UserService,
+        private readonly mailer: MailerService
     ){}
 
     async createToken(user : User){
@@ -80,6 +82,26 @@ export class AuthService {
             throw new UnauthorizedException('Invalid Credentials')
         }
 
+        const token = await this.jwtService.sign({
+            id: user.id,
+            email: user.email,
+        },{
+            expiresIn: '30 minutes',
+            issuer: 'forget',
+            audience: 'users'
+        })
+
+        await this.mailer.sendMail({
+            to: email,
+            from: 'rafael.cena@hotmail.com',
+            subject: 'Reset Password',
+            template: 'forget',
+            context: {
+                name: user.name,
+                token
+            }
+        })
+
         return true
 
     }
@@ -88,18 +110,29 @@ export class AuthService {
 
         // to do validar token
 
-        const id = 1
+        try{
+            const data = await this.jwtService.verify(token, {
+                audience : 'users',
+                issuer: 'forget'
+            })     
+     
+
+            const salt = await bcrypt.genSalt();
+            password = await bcrypt.hash(password, salt);
 
         const user = await this.prisma.user.update({
             where:{
-                id
+                id: data.id
             },
             data:{
                 password
             }
-        })
+         })
 
         return this.createToken(user)
+    }catch(e){
+        throw new BadRequestException('Invalid Token')
+    }
 
     }
 

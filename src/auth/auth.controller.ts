@@ -1,5 +1,5 @@
-import { BadRequestException, Body, Controller, Post, UploadedFile, UseGuards, UseInterceptors } from "@nestjs/common";
-import { FileInterceptor } from "@nestjs/platform-express";
+import { BadRequestException, Body, Controller, FileTypeValidator, MaxFileSizeValidator, ParseFilePipe, Post, UploadedFile, UploadedFiles, UseGuards, UseInterceptors } from "@nestjs/common";
+import { FileInterceptor, FilesInterceptor } from "@nestjs/platform-express";
 import { User } from "src/decorators/user.decorator";
 import { AuthGuard } from "src/guards/auth.guard";
 import { AuthService } from "./auth.service";
@@ -49,10 +49,20 @@ export class AuthController {
         return user;
     }
 
+
     @UseInterceptors(FileInterceptor('file'))
     @UseGuards(AuthGuard)
     @Post('photo')
-    async uploadPhoto(@User() user, @UploadedFile('file') photo : Express.Multer.File){
+    async uploadPhoto(
+        @User() user,
+        @UploadedFile(
+            new ParseFilePipe({
+                validators: [ 
+                    new FileTypeValidator({fileType: 'image/png'}),
+                    new MaxFileSizeValidator({maxSize: 1000000})
+                ]
+            })
+        ) photo : Express.Multer.File){
 
         const path = await join(__dirname, '..', '..', 'storage', 'photos', 'photo_'+ user.id + '.jpg')
        
@@ -63,5 +73,13 @@ export class AuthController {
         }
         return {'message': 'Photo uploaded'}
     }
+
+    @UseInterceptors(FilesInterceptor('files'))
+    @UseGuards(AuthGuard)
+    @Post('files')
+    async uploadFiles(@User() user, @UploadedFiles() files : Express.Multer.File[]){       
+        return files
+    }
+
 
 }

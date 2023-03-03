@@ -13,7 +13,7 @@ export const User = createParamDecorator((filter: string, context : ExecutionCon
             throw new NotFoundException('User not found')
         }
 
-        if(!filter){
+        if(!filter){ 
             return user
         }
     

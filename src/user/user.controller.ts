@@ -24,7 +24,7 @@ export class UserController {
   @Roles(Role.Admin)  // regra de permissao individual
   @Post()
   async create(@Body() body : CreateUserDto) {
-    return this.userService.create(body)
+    return await this.userService.create(body)
   }
 
   @SkipThrottle() // skip throttle

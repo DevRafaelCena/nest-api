@@ -34,13 +34,13 @@ export class UserService {
                 if (email) data.email = email;
 
                 
-                const emailExists = await this.usersRepository.findOne({
+               if(await this.usersRepository.exist({
                     where: {
                         email
                     }
-                })
-                if(emailExists) throw new BadRequestException('Email already exists');
-              
+               })) {
+                     throw new BadRequestException('Email already exists');
+               }
 
 
                 if (role) data.role = role;
@@ -92,7 +92,9 @@ export class UserService {
 
         if (role) data.role = role;
 
-        return await this.usersRepository.update(id, data);
+        await this.usersRepository.update(id, data);
+
+        return await this.readOne(id);
     }
 
     async updatePartial(id, {email, password , name , birthAt, role}: UpdatePatchUserDto){
@@ -115,7 +117,9 @@ export class UserService {
 
         if (role) data.role = role;
 
-        return await this.usersRepository.update(id, data);
+        await this.usersRepository.update(id, data);
+        
+        return await this.readOne(id);
     }
 
     async delete(id: number){

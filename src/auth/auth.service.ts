@@ -138,8 +138,6 @@ export class AuthService {
 
         const user = await this.userService.create(data)
 
-        console.log(user)
-
         return await this.createToken(user)
 
     }

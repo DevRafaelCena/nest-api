@@ -45,11 +45,11 @@ export class UserService {
 
                 if (role) data.role = role;
 
-                const user = this.usersRepository.create(data);
+                const user = this.usersRepository.create(data) as Object;
 
-                const save = await this.usersRepository.save(user)
-
-                console.log(save)
+                const save = await this.usersRepository.save(user).then((user) => {
+                    return user;
+                });               
 
                 return save;
         }catch(err){

@@ -126,7 +126,9 @@ export class UserService {
 
         await this.exists(id);
 
-        return await this.usersRepository.delete(id);
+        await this.usersRepository.delete(id);
+
+        return true;
     }
 
     async exists(id: number){
@@ -139,6 +141,6 @@ export class UserService {
 
         if(!exists){
             throw new NotFoundException('User not found')
-        }
+        }        
     }
 }

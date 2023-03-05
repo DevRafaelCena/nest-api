@@ -25,7 +25,7 @@ export class UserEntity {
         nullable: true
     })
 
-    birthDate: Date;
+    birthAt: Date;
 
     @CreateDateColumn()
     createdAt: string;
